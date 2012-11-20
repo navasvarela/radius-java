@@ -7,13 +7,13 @@ import java.nio.channels.CompletionHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RadiusHandler implements
+public class AcctHandler implements
 		CompletionHandler<AsynchronousSocketChannel, Void> {
-	private static final Logger LOG = LogManager.getLogger(RadiusHandler.class);
+	private static final Logger LOG = LogManager.getLogger(AcctHandler.class);
 
 	private final AsynchronousServerSocketChannel listener;
 
-	public RadiusHandler(AsynchronousServerSocketChannel theListener) {
+	public AcctHandler(AsynchronousServerSocketChannel theListener) {
 		listener = theListener;
 	}
 

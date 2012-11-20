@@ -28,16 +28,8 @@ public class Server {
 
 		group = AsynchronousChannelGroup.withCachedThreadPool(
 				Executors.newCachedThreadPool(), configuration.getThreads());
-		final AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
-				.open(group).bind(
-						new InetSocketAddress(configuration.getPort()));
-		serverSocketChannel
-				.setOption(StandardSocketOptions.SO_RCVBUF, 4 * 1024);
-		serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-
-		// serverSocketChannel.accept(null, new HttpProtocolHandler(
-		// serverSocketChannel, configuration.getHandlerFactory(),
-		// configuration.getMaxPostMB()));
+		startAcct();
+		startAuth();
 		started = true;
 		LOG.debug("Server started successfully");
 		try {
@@ -49,9 +41,29 @@ public class Server {
 
 	}
 
+	protected void startAcct() throws IOException {
+		final AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
+				.open(group).bind(
+						new InetSocketAddress(configuration.getAcctPort()));
+		serverSocketChannel
+				.setOption(StandardSocketOptions.SO_RCVBUF, 4 * 1024);
+		serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+		serverSocketChannel.accept(null, new AcctHandler(serverSocketChannel));
+	}
+
+	protected void startAuth() throws IOException {
+		final AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
+				.open(group).bind(
+						new InetSocketAddress(configuration.getAuthPort()));
+		serverSocketChannel
+				.setOption(StandardSocketOptions.SO_RCVBUF, 4 * 1024);
+		serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+		serverSocketChannel.accept(null, new AuthHandler(serverSocketChannel));
+	}
+
 	public void stop() {
 		if (group != null) {
-			LOG.info("Shutting down LED server...");
+			LOG.info("Shutting down RADIUS server...");
 			group.shutdown();
 		}
 	}
